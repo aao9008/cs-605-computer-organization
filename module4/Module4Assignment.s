@@ -34,6 +34,27 @@ main:
     BL printf
     # End Part 3
 
+    # Bounus: Floating Point Number
+
+    # Prompt user
+    LDR r0, =prompt5
+    BL printf
+
+    # Scanf 
+    LDR r0, =format5
+    LDR r1, =float_val
+    BL scanf
+
+    # Convert 32-float to 64-float
+    LDR r2, =float_val
+    VLDR s0, [r2] @ Load float into single precision register
+    vcvt.f64.f32 d0, s0 @ Convert float -> double (for printf)
+    vmov r1, r2, d0 @ Move double bits into r2:r3 (for printf)
+
+    # Print float
+    LDR r0, =output5
+    BL printf
+
     # Pop stack and return
     LDR lr, [sp, #0]
     ADD sp, sp, #4
@@ -48,3 +69,10 @@ main:
     output2: .asciz "Part 2\n Before:\t%d\tAfter\n"
     
     output3: .asciz "Part 3\nThey said, \"Hello World!\"\n" 
+
+    prompt5:    .asciz "Enter a float: "
+    output5:   .asciz "You entered: %f\n"
+    format5: .asciz "%f"
+    float_val: .float 0.0  
+
+
