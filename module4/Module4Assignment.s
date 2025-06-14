@@ -1,3 +1,9 @@
+#
+# Program Name: Module4Assignment.s
+# Author: Alfredo Ormeno Zuniga
+# Date: 6/14/2025
+# Purpose: Shows int, string, and float printf/scanf
+#
 .text
 .global main
 main:
@@ -10,37 +16,38 @@ main:
     LDR r0, =prompt1
     BL printf
 
-    # Scanf
+    # Scanf - user age input
     LDR r0, =format1
     LDR r1, =age1
     BL scanf
 
-    # Print message
+    # Print users's age
     LDR r0, =output1
     LDR r1, =age1
     LDR r1, [r1, #0]
-    STR r1, [sp, #-4]! @ Push: Decrement SP by 4 and store r1 at the new top of the stack 
     BL printf 
     # END Part 1
 
     # Part 2
+    # Print user age with tabs before and after
     LDR r0, =output2
-    LDR r1, [sp], #4 @ Pop: Load r1 from the top of the stack, then increment SP by 4
+    LDR r1, =age1
+    LDR r1, [r1, #0]
     BL printf
     # END Part 2
 
     # Part 3
+    # Print string that contains double quotation marks
     LDR r0, =output3
     BL printf
     # End Part 3
 
-    # Bounus: Floating Point Number
-
-    # Prompt user
+    # Bounus Question 5: Floating Point Number
+    # Prompt user for a floating point number
     LDR r0, =prompt5
     BL printf
 
-    # Scanf 
+    # Scanf - user float input
     LDR r0, =format5
     LDR r1, =float_val
     BL scanf
@@ -61,15 +68,19 @@ main:
     MOV pc, lr
 
 .data
+    # Variables for Part 1
     prompt1: .asciz "Part 1 \nHow old are you? "
     format1: .asciz "%d"
     age1: .word 0
     output1: .asciz "Wow you are %d years old!\n" 
-   
+
+    # Variables for Part 2
     output2: .asciz "Part 2\n Before:\t%d\tAfter\n"
-    
+
+    # Variables for Part 3
     output3: .asciz "Part 3\nThey said, \"Hello World!\"\n" 
 
+    # Variables for bonus question 5
     prompt5:    .asciz "Enter a float: "
     output5:   .asciz "You entered: %f\n"
     format5: .asciz "%f"
