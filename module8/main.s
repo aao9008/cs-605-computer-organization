@@ -28,7 +28,7 @@ main:
     BL printf
 
     # Scanf - miles (user input)
-    LDR r0, =format1
+    LDR r0, =formatInteger
     LDR r1, =input1Miles
     BL scanf
 
@@ -60,7 +60,7 @@ main:
     BL printf
 
     # Scan user input (hours and miles)
-    LDR r0, =format2
+    LDR r0, =formatDoubleInteger
     LDR r1, =input2Hours
     LDR r2, =input2Miles
     BL scanf
@@ -90,7 +90,7 @@ main:
     BL printf
 
     # Scan user input (temprature)
-    LDR r0, =format3
+    LDR r0, =formatInteger
     LDR r1, =input3Temprature
     BL scanf
 
@@ -104,21 +104,57 @@ main:
     LDR r0, =output3
     BL printf
 
+    #################### Part 4: Convert Inches to Feet ###########################################
+    # Prompt user for inches
+    LDR r0, =prompt4
+    BL printf
+
+    # Scan user input (inches - integer)
+    LDR r0, =formatInteger
+    LDR r1, =input4Inches
+    BL scanf
+
+    # Load user input
+    LDR r0, =input4Inches @ load address of user input
+    LDR r0, [r0, #0] @ load value at address
+
+    # Convert user input (inches) to feet 
+    BL InchesToFt @ r0 will hold feet value as a scaled integer
+    MOV r4, r0 @ Copy converted value to perserved register
+
+    # Display results
+    # Print part 1 of output
+    LDR r0 , =output4Part1
+    LDR r1, =input4Inches @ Load address of user input (inches)
+    LDR r1, [r1, #0] @ Load value at addrees
+    BL printf
+
+    # Print the scaled int
+    MOV r0, r4 @ Pass scaled feet value to r0  for printScaledInt function call
+    MOV r1, #10 @ Pass teh scale factor to r1 for printScaledInt function call
+    BL printScaledInt @ Print scaled int as decimal with one decimal place of accuracy
+
+    # Print part 2 of output
+    LDR r0,  =output4Part2
+    BL printf
+
     # Pop stack and return
     LDR lr, [sp, #0]
     ADD sp, sp, #4
     MOV pc, lr
 
 .data
-    # Part 1 Variables
-    format1: .asciz "%d"
-    input1Miles: .word 0
+    # Shared Variables
+    formatDoubleInteger: .asciz "%d%d"
+    formatInteger: .asciz "%d"
     newline: .asciz "\n\n"
+
+    # Part 1 Variables
+    input1Miles: .word 0
     output1: .asciz "Distance in kilometers is "
     prompt1: .asciz "Please enter miles (integers only) for conversion to kilometers: "
     
     # Part 2 Variables
-    format2: .asciz "%d%d"
     input2Hours: .word 0
     input2Miles: .word 0
     output2Part1: .asciz "The converted velocity is approximately "
@@ -126,9 +162,14 @@ main:
     prompt2: .asciz "Pleaes enter hours then miles (integers only) for conversion to kilometers per hour: "
 
     # Part 3 Variables
-    format3: .asciz "%d"
     input3Temprature: .word 0
-    output3: .asciz "The converted temprature is %d degrees Fahrenheit.\n"
+    output3: .asciz "The converted temprature is %d degrees Fahrenheit.\n\n"
     prompt3: .asciz "Please enter a temprature (integers only) in Celsius: "
+
+    # Part 4 Variables
+    input4Inches: .word 0
+    output4Part1: .asciz "%d inches is "
+    output4Part2: .asciz " feet\n\n"
+    prompt4: .asciz "Please enter length in inches (integer only) to convert to feet: "
 
      

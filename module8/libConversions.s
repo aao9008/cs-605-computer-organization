@@ -175,3 +175,33 @@ CToF:
     ADD sp, sp, #4
     MOV pc, lr
 # END CToF
+
+# Function: InchesToFt
+# Purpose: To convert a length in inches to feet, scaled to preserve one decimal place.
+# Input: r0 - length in inches (integer)
+# Output: r0 - length in feet scaled by 10 (integer)
+# Pseudo Code:
+#   scaled_feet = (inches * 10) / 12
+#
+#   This allows the result to retain 1 digit of decimal precision using only integer math.
+#   The result can be printed using the printScaledInt function with a scale factor of 10.
+.text
+.global InchesToFt
+InchesToFt:
+    # Push stack
+    SUB sp, #4
+    STR lr, [sp, #0]
+    
+    # Multiply inches by scale factor of 10
+    MOV r1, #10 @ r1 <- 10 (scale factor; MUL has no immediate format)
+    MUL r0, r0, r1 @ r0 <- r0 (inches) * 10 (scale factor) ; this will give one decmial place of accuracy
+
+    # Divide the scaled inches by 12 to get the scaled feet
+    MOV r1, #12 @ r1 is the divisor in divsison function, move 12 into r1 
+    BL __aeabi_idiv @ r0 (scaled feet) <- r0 (scaled inches) / r1 (12)
+
+    # Pop the stack
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr 
+# END InchesToFt
