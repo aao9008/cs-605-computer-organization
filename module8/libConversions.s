@@ -141,3 +141,37 @@ kph:
     ADD sp, sp, #12
     MOV pc, lr
 # END kph
+
+# Function: CToF
+# Purpose: To convert a temperature from Celsius to Fahrenheit
+# Input: r0 - temperature in Celsius (integer)
+# Output: r0 - temperature in Fahrenheit
+# Pseudo Code:
+#   fahrenheit = (celsius * 9) / 5 + 32
+#
+#   Uses integer math for conversion, resulting in an approximate Fahrenheit value.
+.text
+.global CToF
+CToF:
+    # Push stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    # First temperature (celcius) by 9
+    MOV r1, #9 @ Move the immediate value of 9 into r3
+    MUL r0, r0, r1 @ Multiply the temp by 9 ( r1 <- r2 * r3)
+
+    # Divide the temprature by 5
+    # r0 holds the current result and is the numberator. No changes needed.
+    MOV r1, #5 @ r1 is the denomenator, so move immediate value 5 into r1
+    BL __aeabi_idiv @ Divide the temprature by 5 and store result in r0 (r0 <- r0/r1)
+   
+
+    # Add 32 to the temprature to get final temprature value in Fahrenheit
+    Add r0, r0, #32
+
+    # Pop stack and return
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr
+# END CToF

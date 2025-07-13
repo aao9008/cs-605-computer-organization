@@ -84,6 +84,26 @@ main:
     LDR r0, =output2Part2
     BL printf
 
+    ################## Part 3: Convert temprature from Celsius to Fahrenheit #####################
+    # Prompt user for temprature in Celsius
+    LDR r0, =prompt3
+    BL printf
+
+    # Scan user input (temprature)
+    LDR r0, =format3
+    LDR r1, =input3Temprature
+    BL scanf
+
+    # Load user input into r0
+    LDR r0, =input3Temprature @ Load address of user input
+    LDR r0, [r0, #0] @ Load temprature value located at this address
+    BL CToF
+
+    # Display Results
+    MOV r1, r0
+    LDR r0, =output3
+    BL printf
+
     # Pop stack and return
     LDR lr, [sp, #0]
     ADD sp, sp, #4
@@ -95,13 +115,20 @@ main:
     input1Miles: .word 0
     newline: .asciz "\n\n"
     output1: .asciz "Distance in kilometers is "
-    prompt1: .asciz "Enter miles for conversion to kilometers: "
+    prompt1: .asciz "Please enter miles (integers only) for conversion to kilometers: "
     
     # Part 2 Variables
     format2: .asciz "%d%d"
     input2Hours: .word 0
     input2Miles: .word 0
     output2Part1: .asciz "The converted velocity is approximately "
-    output2Part2: .asciz " kph.\n"
-    prompt2: .asciz "Enter hours then miles for conversion to kilometers per hour: "
+    output2Part2: .asciz " kph.\n\n"
+    prompt2: .asciz "Pleaes enter hours then miles (integers only) for conversion to kilometers per hour: "
+
+    # Part 3 Variables
+    format3: .asciz "%d"
+    input3Temprature: .word 0
+    output3: .asciz "The converted temprature is %d degrees Fahrenheit.\n"
+    prompt3: .asciz "Please enter a temprature (integers only) in Celsius: "
+
      
