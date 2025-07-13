@@ -6,15 +6,15 @@
 # Functions:
 #   main – Coordinates input/output and calls unit conversion functions
 # Inputs:
-#   - Miles (for speed calculation)
+#   - Miles (for speed calculation & distance conversion)
 #   - Hours (for speed calculation)
 #   - Celsius (for temperature conversion)
 #   - Inches (for length conversion)
 # Outputs:
+#   - Kilometers 
 #   - Kilometers per hour (kph)
 #   - Temperature in Fahrenheit
 #   - Length in feet
-
 .text
 .global main
 main:
@@ -22,7 +22,7 @@ main:
     SUB sp, sp, #4
     STR lr, [sp, #0]
     
-    # Function 1: Convert miles to km using integer math
+    #################### Part 1: Convert miles to km using integer math ###################
     # Prompt the user for miles
     LDR r0, =prompt1
     BL printf
@@ -37,11 +37,51 @@ main:
     LDR r0, [r0, #0] @ Load value located at this address
     BL miles2Kilometers @ Call the conversion function located in conversion library
     
-    # Output result
-    MOV r2, r0 @ Move the value returned by the function in r0 to r2
-    LDR r1, =input1Miles @ Load address of original input into r1
-    LDR r1, [r1, #0] @ Load value located at this address into r1
-    LDR r0, =output1MilestoKilometers
+    # Store output in preserved register 
+    MOV r4, r0 @ r4 <- r0 (kilometers)
+
+    # Display result
+    # Print output message
+    LDR r0, =output1
+    BL printf 
+
+    # Append final result to the end of the output message
+    MOV r0, r4 @ r0 <- r4 (kilometers)
+    MOV r1, #10 @ Scale value used to format scaled integer reslut to decimal number with 1 point precision
+    BL printScaledInt
+
+    # Print new line character to move cursor to next line
+    LDR r0, =newline
+    BL printf
+
+    ################## Part 2: Convert miles and hours to kph #####################
+    # Prompt user for hours and miles
+    LDR r0, =prompt2
+    BL printf
+
+    # Scan user input (hours and miles)
+    LDR r0, =format2
+    LDR r1, =input2Hours
+    LDR r2, =input2Miles
+    BL scanf
+
+    # Convert hours and miles to kph
+    LDR r0, =input2Hours
+    LDR r0, [r0, #0]
+    LDR r1, =input2Miles
+    LDR r1, [r1, #0]
+    BL kph
+
+    # Display the converted value
+    MOV r4, r0
+    LDR r0, =output2Part1
+    BL printf
+
+    MOV r0, r4
+    MOV r1, #10
+    BL printScaledInt
+
+    LDR r0, =output2Part2
     BL printf
 
     # Pop stack and return
@@ -50,8 +90,18 @@ main:
     MOV pc, lr
 
 .data
-    prompt1: .asciz "Enter miles for conversion to kilometers: "
-    output1MilestoKilometers: .asciz "%d miles is approximately %d kilometers.\n"
+    # Part 1 Variables
     format1: .asciz "%d"
     input1Miles: .word 0
-    convertedDistance1: .word 0
+    newline: .asciz "\n\n"
+    output1: .asciz "Distance in kilometers is "
+    prompt1: .asciz "Enter miles for conversion to kilometers: "
+    
+    # Part 2 Variables
+    format2: .asciz "%d%d"
+    input2Hours: .word 0
+    input2Miles: .word 0
+    output2Part1: .asciz "The converted velocity is approximately "
+    output2Part2: .asciz " kph.\n"
+    prompt2: .asciz "Enter hours then miles for conversion to kilometers per hour: "
+     
