@@ -1,14 +1,29 @@
 # Program Name: main.s
 # Author: Alfredo Ormeno Zuniga
 # Date: 7/19/2025
-# Purpose: This program reads input values from the user, performs various logical checks using
-#          functions defined in libModule9.s, and displays the results.
-# Functions:
-#   main – Coordinates input/output and calls unit conversion functions
+# Purpose: 
+#   This program performs several tasks involving user input and logical evaluation.
+#   It demonstrates the use of external functions written in libModule9.s by:
+#     - Checking if a user-input character is alphabetic using both logical and non-logical methods
+#     - Prompting the user for a student's name and average, and printing the corresponding letter grade
+#     - Prompting the user for three integers and printing the maximum value
+#
+# Functions Called (from libModule9.s):
+#   - isAlphaLogical:     Determines if a character is alphabetic using logical operations
+#   - isAlphaNoLogical:   Determines if a character is alphabetic using only comparisons and branches
+#   - gradeStudent:       Prompts for a student name and average, prints a grade or error
+#   - findMaxOf3:         Returns the maximum of three integer values
+#
 # Inputs:
-#   - single character (for isAlpha character check).
+#   - A single character (used in both alphabetic checks)
+#   - A student name (may include spaces)
+#   - A student average (integer 0–100)
+#   - Three integer values
+#
 # Outputs:
-#   - Boolean
+#   - A message indicating if the character is alphabetic
+#   - The student's name and grade (or error if invalid)
+#   - The maximum of three input values
 .text
 .global main
 main:
@@ -16,7 +31,20 @@ main:
     SUB sp, sp, #4
     STR lr, [sp, #0]
 
-    #############Function isAlphaLogical##############
+#############Function isAlphaLogical##############
+# Pseudo Code:
+#   printf("isAlpha check will be done with logical operators.\n");
+#   printf("Please enter a single character...\n");
+#   scanf(" %c", &inputChar);
+#
+#   result = isAlphaLogical(inputChar);
+#
+#   if (result == 1) {
+#       printf("The character '%c' is an alphabetical character.\n", inputChar);
+#   } else {
+#       printf("The character '%c' is NOT an alphabetical character.\n", inputChar);
+#   }
+
     # Declare function being used
     LDR r0, =logical
     BL printf 
@@ -56,7 +84,20 @@ main:
 
     LogicalEndIF:
 
-    ##############Function isAlphaNoLogical##############
+##############Function isAlphaNoLogical##############
+# Pseudo Code:
+#   printf("isAlpha check will be done with no logical operators.\n");
+#   printf("Please enter a single character...\n");
+#   scanf(" %c", &inputChar);
+#
+#   result = isAlphaNoLogical(inputChar);
+#
+#   if (result == 1) {
+#       printf("The character '%c' is an alphabetical character.\n", inputChar);
+#   } else {
+#       printf("The character '%c' is NOT an alphabetical character.\n", inputChar);
+#   }
+
     # Declare functino being used
     LDR r0, =NoLogical
     BL printf
@@ -150,4 +191,3 @@ main:
     inputValue3: .word 0
     outputMax: .asciz "The max value is %d.\n"
     prompt3Values: .asciz "Please enter 3 integer values.\nThe max value will be printed.\n"
-
