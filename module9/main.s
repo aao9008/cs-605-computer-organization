@@ -24,6 +24,9 @@ main:
     LDR r0, =format
     BL printf
 
+    # Function Grade Student
+    BL gradeStudent
+
     # Pop stack and return
     LDR lr, [sp, #0]
     ADD sp, sp, #4
