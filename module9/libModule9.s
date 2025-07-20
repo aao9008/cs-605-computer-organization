@@ -283,16 +283,52 @@ gradeStudent:
     MOV pc, lr 
 # END gradeStudent
 
+# Function: findMaxOf3
+# Purpose: Given three integers, return the largest value.
+#
+# Input:
+#   r0 - val1
+#   r1 - val2
+#   r2 - val3
+# Output:
+#   r0 - max(val1, val2, val3)
+#
+# Pseudo Code:
+#   int findMaxOf3(int val1, int val2, int val3) {
+#       int max = val1;
+#       if (val2 > max) max = val2;
+#       if (val3 > max) max = val3;
+#       return max;
+#   }
+.text
+.global findMaxOf3
+findMaxOf3:
+    # Push stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
 
+    # r0 will start as max value
+    # Compare current max to remaining two values
+    CMP r1, r0 @ Compare val2 > val1?
+    MOVGT r0, r1 @ If val2 > val1, r0 = val2
+
+    CMP r2, r0 @ Compare val3 > current max?
+    MOVGT r0, r2 @ If val3 > max, r0 = val3
+
+    # Pop stack and return
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    MOV pc, lr @ Return (r0 holds result)
+# END findMaxOf3
 
 .data
     formatGrade: .asciz "%d"
     formatName: .asciz "%[^\n]"
-    gradeA: .asciz "Grade is A\n"
-    gradeB: .asciz "Grade is B\n"
-    gradeC: .asciz "Grade is C\n"
-    gradeD: .asciz "Grade is D\n"
-    gradeF: .asciz "Grade is F\n"
+    gradeA: .asciz "Grade is A\n\n"
+    gradeB: .asciz "Grade is B\n\n"
+    gradeC: .asciz "Grade is C\n\n"
+    gradeD: .asciz "Grade is D\n\n"
+    gradeF: .asciz "Grade is F\n\n"
     inputGrade: .word 0
     inputName: .space 100
     outputName: .asciz "\nStudent Name: %s\n"
