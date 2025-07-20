@@ -323,7 +323,7 @@ findMaxOf3:
 
 .data
     formatGrade: .asciz "%d"
-    formatName: .asciz "%[^\n]"
+    formatName: .asciz " %[^\n]"
     gradeA: .asciz "Grade is A\n\n"
     gradeB: .asciz "Grade is B\n\n"
     gradeC: .asciz "Grade is C\n\n"
