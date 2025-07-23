@@ -1,13 +1,23 @@
 #
-# Program Name: libConversions.s
+# Program Name: libModule9.s
 # Author: Alfredo Ormeno Zuniga
 # Date: 7/19/2025
-# Purpose: This file contains utility functions for demonstrating branching and logical operations in ARM. 
+# Purpose:
+#   This file contains utility functions for demonstrating conditional branching,
+#   comparison, and logical evaluation in ARM Assembly.
+#   These functions are intended to be called from a main driver program.
+#
 # Functions:
-#   isAlphaLogical - Checks if use input value is a character or not
-#  
-# Inputs: Varies by function (see function descriptions)
-# Outputs: Varies by function (see function descriptions)
+#   - isAlphaLogical:     Determines if a character is alphabetic using logical operators
+#   - isAlphaNoLogical:   Determines if a character is alphabetic using only comparisons and branches
+#   - gradeStudent:       Prompts for a student name and average, validates input, and prints the corresponding grade
+#   - findMaxOf3:         Returns the largest of three input integers
+#
+# Inputs:
+#   Vary by function — see individual function headers for specific usage.
+#
+# Outputs:
+#   Vary by function — see individual function headers for specific usage.
 
 # Function: isAlphaLogical
 # Purpose: To check if user input is a character using logical operators.
@@ -144,9 +154,7 @@ isAlphaNoLogical:
 #          If the average is out of range, print an error message.
 #
 # Input:  None (input is taken via scanf)
-# Output: Prints result in the format:
-#         "[name] received a grade of [A/B/C/F]\n"
-#         or an error message if the average is invalid.
+# Output: Prints student name and grade to the console, and error message if grade is invalid.
 #
 # Pseudo Code:
 #   void gradeStudent() {
