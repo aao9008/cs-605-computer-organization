@@ -62,8 +62,13 @@ listPrimes:
 
     MOV r6, #1 @ isPrime(r6) = 1; assume i is prime
     MOV r7, #2 @ j = 2 (initialize inner loop iterator)
-    # r8 = r5/2 (i/2)
 
+    # Set upper limit for inner loop (i/2)
+    MOV r0, r5 @ r0 <- r5 (i)
+    MOV r1, #2
+    BL __aeabi_idiv
+    MOV r8, r0 @ r8 <- i/2
+    
     startInnerLooop:
         CMP r7, r8
         BGT endInnerLoop @ if j > i/2, exit
@@ -149,4 +154,133 @@ remainder:
     MOV pc, lr
 # END remainder
 
+# Function: guessNumber
+# Purpose: To allow the user to guess a randomly generated number between 1 and a user-defined maximum.
+#          The program gives feedback ("Too high" / "Too low") after each guess and counts total attempts.
+#
+# Input:  r0 - maximum value (upper bound for random number generation)
+#
+# Output: Prints instructions and feedback after each guess.
+#         At the end, prints the number of guesses taken to guess correctly.
+#
+# Pseudo Code:
+#   void guessNumber(int max) {
+#       int secret = random_between(1, max);
+#       int guess = -1;            // initialize to a value not equal to secret
+#       int attempts = 0;
+#
+#       while (guess != secret) {
+#           printf("Enter your guess: ");
+#           scanf("%d", &guess);
+#           attempts++;
+#
+#           if (guess < secret)
+#               printf("Too low\n");
+#           else if (guess > secret)
+#               printf("Too high\n");
+#       }
+#
+#       printf("Correct! You guessed it in %d attempts.\n", attempts);
+#   }
+.text
+.global guessNumber
+guessNumber:
+    # Push the stack
+    SUB sp, sp, #16
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+    STR r6, [sp, #12]
 
+    # Generate random number from 1 to max
+    BL generateRandom @ result stored in r0
+    MOV r4, r0 @ r4 <- r0 (secret)
+    MOV r5, #0 @ r5 <- number of atttempts
+    MOV r6, #0 @ r6 will hold user guess. Initialize to 0
+
+    startGuessLoop:
+        # Check if loop is complete (guess == secret)
+        CMP r6, r4
+        BEQ endGuessLoop
+
+        # loop block
+        LDR r0, =promptGuess
+        BL printf
+
+        # Scan for user guess (int)
+        LDR r0, =formatInt
+        LDR r1, =guess
+        BL scanf
+
+        # Increment attempts counter 
+        ADD r5, r5, #1
+
+        # if guess < secret
+        LDR r6, =guess
+        LDR r6, [r6, #0] @ Load guess value 
+        CMP r6, r4 
+        BGT elseIf
+            # Print too low
+            LDR r0, =promptLow
+            BL printf
+            B endIf
+
+        # else if guess > secret
+        elseIf: 
+            CMP r6, r4
+            BEQ endGuessLoop
+            # Print to high
+            LDR r0, =promptHigh
+            BL printf
+
+        B startGuessLoop
+
+    endGuessLoop:
+
+    # Prompt correct guess message
+    MOV r0, =promptCorrect
+    MOV r1, r5
+    BL printf
+# END guessNumber
+
+# Function: generateRandom
+# Purpose: To generate a pseudo-random number between 1 and a given maximum value using the C library's rand() function.
+#
+# Input:  r0 - max (upper bound of random range, inclusive)
+# Output: r0 - random integer between 1 and max (inclusive)
+#
+# Pseudo Code:
+#   int generateRandom(int max) {
+#       int r = rand(); // Get raw random number from 0 to RAND_MAX
+#       r = r % max; // Restrict range to 0 to max-1 (no MOD operator — uses custom remainder)
+#       return r + 1; // Shift to 1 to max
+#   }
+.text
+generateRandom:
+    # Push the stack
+    SUB sp, sp, #4
+    STR lr, [sp, #0]
+
+    BL rand @ call C function rand()
+    @ r0 now contains a random number
+
+    MOV r1, r0 @ r1 <- r0 (max)
+
+    @ scale it to 1..max (assume max is in r1)
+    BL remainder  @ r0 = r0 % r1
+
+    ADD r0, r0, #1 @ shift from 0..(max-1) to 1..max
+    
+    # Pop stack 
+    LDR lr, [sp, #0]
+    ADD sp, sp, #4
+    LDR pc, lr
+# END generateRandom
+
+.data
+    formatInt: .asciz "%d"
+    guess: .word 0
+    promptCorrect: .asciz "Correct! You guessed the right number in %d attempts!\n"
+    promptGuess: .asciz "Please enter your guess (integers only: )"
+    promptHigh: .asciz "Too low\n"
+    promptLow: .asciz "Too low\n"
