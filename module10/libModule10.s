@@ -69,7 +69,7 @@ listPrimes:
     BL __aeabi_idiv
     MOV r8, r0 @ r8 <- i/2
     
-    startInnerLooop:
+    startInnerLoop:
         CMP r7, r8
         BGT endInnerLoop @ if j > i/2, exit
 
@@ -95,7 +95,7 @@ listPrimes:
     BNE nextIteration  @ if isPrime != 1, skip printing
 
     # Print out prime number i
-    MOV r0, =formatInt
+    LDR r0, =formatInt
     MOV r1, r5
     BL printf
 
@@ -141,7 +141,7 @@ remainder:
     startRemainderLoop:
         # Loop: while (dividend >= divisor) 
         CMP r0, r1
-        BLT endLoop @ Exit loop if dividend < divisor 
+        BLT endRemainderLoop @ Exit loop if dividend < divisor 
 
         SUB r0, r0, r1 @ dividend -= divisor
         
@@ -215,20 +215,24 @@ guessNumber:
         # Increment attempts counter 
         ADD r5, r5, #1
 
-        # if guess < secret
+        # Load guess value from memory
         LDR r6, =guess
         LDR r6, [r6, #0] @ Load guess value 
+
+        # if guess == secret
+        CMP r6, r4
+        BEQ endGuessLoop     @ If correct, go to end
+        
+        # else if guess < secret
         CMP r6, r4 
-        BGT elseIf
+        BGT else
             # Print too low
             LDR r0, =promptLow
             BL printf
-            B endIf
+            B startGuessLoop
 
         # else if guess > secret
-        elseIf: 
-            CMP r6, r4
-            BEQ endGuessLoop
+        else: 
             # Print to high
             LDR r0, =promptHigh
             BL printf
@@ -238,9 +242,17 @@ guessNumber:
     endGuessLoop:
 
     # Prompt correct guess message
-    MOV r0, =promptCorrect
+    LDR r0, =promptCorrect
     MOV r1, r5
     BL printf
+
+    # Pop the stack
+    LDR lr, [sp, #0]
+    LDR r4, [sp, #4]
+    LDR r5, [sp, #8]
+    LDR r6, [sp, #12]
+    ADD sp, sp, #16
+    MOV pc, lr
 # END guessNumber
 
 # Function: generateRandom
@@ -258,29 +270,32 @@ guessNumber:
 .text
 generateRandom:
     # Push the stack
-    SUB sp, sp, #4
+    SUB sp, sp, #8
     STR lr, [sp, #0]
+    STR r4, [sp, #4]
+
+    MOV r4, r0 @ r1 <- r0 (max)
 
     BL rand @ call C function rand()
     @ r0 now contains a random number
 
-    MOV r1, r0 @ r1 <- r0 (max)
-
     @ scale it to 1..max (assume max is in r1)
-    BL remainder  @ r0 = r0 % r1
+    MOV r1, r4
+    BL remainder  @ r0 = r0 % r1 
 
     ADD r0, r0, #1 @ shift from 0..(max-1) to 1..max
     
     # Pop stack 
     LDR lr, [sp, #0]
-    ADD sp, sp, #4
-    LDR pc, lr
+    LDR r4, [sp, #4]
+    ADD sp, sp, #8
+    MOV pc, lr
 # END generateRandom
 
 .data
     formatInt: .asciz "%d"
     guess: .word 0
     promptCorrect: .asciz "Correct! You guessed the right number in %d attempts!\n"
-    promptGuess: .asciz "Please enter your guess (integers only: )"
-    promptHigh: .asciz "Too low\n"
-    promptLow: .asciz "Too low\n"
+    promptGuess: .asciz "Please enter your guess (integers only): "
+    promptHigh: .asciz "Too high\n\n"
+    promptLow: .asciz "Too low\n\n"

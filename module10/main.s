@@ -27,8 +27,11 @@ main:
     SUB sp, sp, #4
     STR lr, [sp, #0]
 
-
     # -------- Prompt for guessing game max --------
+    MOV r0, #0
+    BL time
+    BL srand 
+
     LDR r0, =promptGuessMax
     BL printf
 
@@ -36,9 +39,9 @@ main:
     LDR r1, =guessMax
     BL scanf
 
-    @ Call guessNumber(guessMax)
+    # Call guessNumber(guessMax)
     LDR r0, =guessMax
-    LDR r0, [r0]           @ r0 = value of guessMax
+    LDR r0, [r0] @ r0 = value of guessMax
     BL guessNumber
 
     # Pop the stack
@@ -47,6 +50,7 @@ main:
     MOV pc, lr
 
 .data
-    promptPrime:     .asciz "Enter an upper limit to list primes: "
-    promptGuessMax:  .asciz "Enter a maximum value for the guessing game: "
-    formatInt:       .asciz "%d"
+    promptPrime: .asciz "Enter an upper limit to list primes: "
+    promptGuessMax: .asciz "Enter a maximum value for the guessing game: "
+    formatInt: .asciz "%d"
+    guessMax: .word 0
