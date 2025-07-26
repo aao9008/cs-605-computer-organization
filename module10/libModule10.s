@@ -95,7 +95,7 @@ listPrimes:
     BNE nextIteration  @ if isPrime != 1, skip printing
 
     # Print out prime number i
-    LDR r0, =formatInt
+    LDR r0, =formatPrimeList
     MOV r1, r5
     BL printf
 
@@ -105,6 +105,8 @@ listPrimes:
     B startOuterLoop
 
     endOuterLooop:
+    LDR r0, =formatNewLine
+    BL printf 
 
     # Pop stack
     LDR lr, [sp, #0]
@@ -294,6 +296,8 @@ generateRandom:
 
 .data
     formatInt: .asciz "%d"
+    formatNewLine: .asciz "\n\n"
+    formatPrimeList: .asciz "%d "
     guess: .word 0
     promptCorrect: .asciz "Correct! You guessed the right number in %d attempts!\n"
     promptGuess: .asciz "Please enter your guess (integers only): "

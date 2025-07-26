@@ -27,6 +27,33 @@ main:
     SUB sp, sp, #4
     STR lr, [sp, #0]
 
+    # -------- Prompt for prime upper limit --------
+    input_loop:
+        LDR r0, =promptPrime
+        BL printf
+
+        LDR r0, =formatInt
+        LDR r1, =primeLimit
+        BL scanf
+
+        # Load the entered number into r0
+        LDR r0, =primeLimit
+        LDR r0, [r0] @ r0 = *primeLimit
+
+        @ if r0 < 3
+        MOV r1, #3
+        CMP r0, r1
+        BLT print_error @ If input < 3, print error and loop
+            # Valid input: call listPrimes
+            BL listPrimes
+            B end_input @ Exit the loop
+
+        print_error:
+            LDR     r0, =errorMsg
+            BL      printf
+            B       input_loop  @ Go back and prompt again
+    end_input:
+
     # -------- Prompt for guessing game max --------
     MOV r0, #0
     BL time
@@ -50,6 +77,8 @@ main:
     MOV pc, lr
 
 .data
+    errorMsg:    .asciz "Error: Please enter an integer ≥ 3.\n\n"
+    primeLimit: .word 0
     promptPrime: .asciz "Enter an upper limit to list primes: "
     promptGuessMax: .asciz "Enter a maximum value for the guessing game: "
     formatInt: .asciz "%d"
