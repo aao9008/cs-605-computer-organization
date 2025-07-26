@@ -57,19 +57,35 @@ main:
     # -------- Prompt for guessing game max --------
     MOV r0, #0
     BL time
-    BL srand 
+    BL srand
 
-    LDR r0, =promptGuessMax
-    BL printf
+    guess_input_loop:
+        LDR r0, =promptGuessMax
+        BL printf
 
-    LDR r0, =formatInt
-    LDR r1, =guessMax
-    BL scanf
+        LDR r0, =formatInt
+        LDR r1, =guessMax
+        BL scanf
 
-    # Call guessNumber(guessMax)
-    LDR r0, =guessMax
-    LDR r0, [r0] @ r0 = value of guessMax
-    BL guessNumber
+        # Load guessMax into r0
+        LDR r0, =guessMax
+        LDR r0, [r0] @ r0 = *guessMax
+
+        # Check if r0 <= 1
+        MOV r1, #2
+        CMP r0, r1
+        BLT guess_print_error @ if input < 2, show error and repeat
+
+        # Valid input - call guessNumber(guessMax)
+        BL guessNumber
+        B guess_done
+
+    guess_print_error:
+        LDR r0, =guessErrorMsg
+        BL printf
+        B guess_input_loop @ repeat prompt
+
+    guess_done:
 
     # Pop the stack
     LDR lr, [sp, #0]
@@ -80,6 +96,7 @@ main:
     errorMsg:    .asciz "Error: Please enter an integer ≥ 3.\n\n"
     primeLimit: .word 0
     promptPrime: .asciz "Enter an upper limit to list primes: "
-    promptGuessMax: .asciz "Enter a maximum value for the guessing game: "
+    promptGuessMax: .asciz "Enter a maximum value for the guessing game (>1): "
     formatInt: .asciz "%d"
+    guessErrorMsg:  .asciz "Error: Please enter an integer greater than 1.\n\n"
     guessMax: .word 0
