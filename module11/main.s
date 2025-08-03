@@ -8,13 +8,14 @@
 #   The result is printed to the terminal.
 #
 # Functions Called:
-#   - F:         Recursively calculates the nth Fibonacci number
+#   - F: Recursively calculates the nth Fibonacci number
+#   - Mult: Recursivley calculates the product of m and n
 #
 # Inputs:
-#   - User enters a single integer value `n`
+#   - Varies by funciton. Please see function header
 #
 # Outputs:
-#   - The nth Fibonacci number is printed to the terminal
+#   - Varies by funciton. Please see function header
 #
 .text
 .global main
