@@ -97,4 +97,90 @@ F:
     MOV pc, lr
 # END F
 
+#
+# Function: Mult
+# Purpose:
+#   Performs multiplication using recursion and successive addition.
+#   Mult(m, n) = m + m + ... + m (n times)
+#
+# Inputs:
+#   r0 - multiplier (m)
+#   r1 - number of times to add (n)
+#
+# Outputs:
+#   r0 - result of m * n
+#
+# Pseudocode:
+# int Mult(int m, int n, bool isNegativeFlag) {
+#     bool isNegative = false;
+#
+#     if (n < 0) {
+#         isNegative = true;
+#         n = -n;
+#     }
+#
+#     // Base case
+#     if (n == 1) {
+#         result = m;
+#     } else {
+#         result = m + Mult(m, n - 1);
+#     }
+#
+#     if (isNegative) {
+#         result = -result;
+#     }
+#
+#     return result;
+# }
+#
+.text
+.global Mult
+Mult:
+    # Push the stack
+    SUB sp, sp, #12
+    STR lr, [sp, #0]
+    STR r4, [sp, #4]
+    STR r5, [sp, #8]
+
+    # Perserve the value of m
+    MOV r4, r0
+
+    # Initialize isNegativeFlag to 0
+    MOV r5, #0
+
+    CMP r1, #0
+    BGE checkBaseCase @ If n >= 0, skip negation setup
+
+    # n is negative: set a flag and make n positive
+    MOV r5, #1 @ r2 will hold the "isNegative" flag
+    RSB r1, r1, #0 @ r1 = -r1
+
+    checkBaseCase:
+    # if (n == 1)
+    CMP r1, #1
+    BNE recurseMult
+        B maybeNegateResult @ return m (r0)
+    
+    recurseMult:
+        SUB r1, r1, #1 @ r1 <- n - 1
+        BL Mult @ Call Mult(m, n-1)
+        ADD r0, r4, r0 @ r0 <- m + Mult(m, n-1)
+
+    maybeNegateResult:
+    CMP r5, #1
+    BNE endMult
+    RSB r0, r0, #0 @ r0 = -r0
+
+    endMult:
+    # Pop the stack
+    LDR lr, [sp, #0]
+    LDR r4, [sp, #4]
+    LDR r5, [sp, #8]
+    ADD sp, sp, #12
+    MOV pc, lr
+# END Mult
+
+
+
+
 
